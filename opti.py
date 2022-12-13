@@ -59,19 +59,22 @@ def modeleDecoupePapierRemi(width, listeBandes, prix_euro_par_metre, prix_waste)
     # CONSTRAINTS
     #############
 
-    # get total produced
+    # Get total produced
+    # Example :
+    # total_produced = 3AAA + 3AAB + ... + 4EEEE
     total_produced = 0
     for i in range(0, len(cuts)):
         total_produced += len(cuts[i]) * var[i]
 
-    # maximum paper size = 1000
+    # Maximum paper size = 1000
     m += total_produced <= 1000
 
     # Not a single band can represent more than 50% of the total length of the paper
+    # Example :
+    # Letter : A
+    # 3AAA + ABB + ABC + ... <= 0.5 * total_produced
     for i in range(0, len(listeBandes)):
         letter = chr(65 + i)
-        # For A, it will be:
-        # 3AAA + 2AAB + 2AAC + 2AAD + 2AAE + ABB + ABC + ABD + ABE + ACC + ACD + ACE + ADD + ADE + AEE
         m += xsum(var[j] * varname[j].count(letter) for j in range(0, len(cuts)) if letter in varname[j]) <= 0.5 * total_produced
     
     # Must produce 100 meters more of A band than C band
@@ -148,21 +151,24 @@ def modeleDecoupePapierAdam(width, listeBandes, prix_euro_par_metre, prix_waste)
     #############
     # CONSTRAINTS
     #############
-    # get total produced
+
+    # Get total produced
+    # Example :
+    # total_produced = 3AAA + 3AAB + ... + 4EEEE
     total_produced = 0
     for i in range(0, len(cuts)):
         total_produced += len(cuts[i]) * var[i]
 
-    # maximum paper size = 1000
+    # Maximum paper size = 1000
     m += total_produced <= 1000
 
     # Not a single band can represent more than 50% of the total length of the paper
+    # Example :
+    # Letter : A
+    # 3AAA + ABB + ABC + ... <= 0.5 * total_produced
     for i in range(0, len(listeBandes)):
         letter = chr(65 + i)
-        # For A, it will be:
-        # 3AAA + 2AAB + 2AAC + 2AAD + 2AAE + ABB + ABC + ABD + ABE + ACC + ACD + ACE + ADD + ADE + AEE
-        m += xsum(var[j] * varname[j].count(letter) for j in range(0, len(cuts)) if
-                  letter in varname[j]) <= 0.5 * total_produced
+        m += xsum(var[j] * varname[j].count(letter) for j in range(0, len(cuts)) if letter in varname[j]) <= 0.5 * total_produced
 
     # Total of band A + band C must be less than 750
     # Example :
