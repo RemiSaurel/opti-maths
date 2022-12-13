@@ -80,7 +80,14 @@ def modeleDecoupePapierRemi(width, listeBandes, prix_euro_par_metre, prix_waste)
     # Must produce 100 meters more of A band than C band
     # Example :
     # 3AAA + 2AAB + AEE >= (BCD + 3CCC) + 100
-    m += xsum(var[j] * varname[j].count('A') for j in range(0, len(cuts)) if 'A' in varname[j]) >= xsum(var[j] * varname[j].count('C') for j in range(0, len(cuts)) if 'C' in varname[j]) + 100
+    total_A = 0
+    total_C = 0
+    for i in range(0, len(cuts)):
+        total_A += var[i] * varname[i].count("A")
+        total_C += var[i] * varname[i].count("C")
+    # print(f'Total A : {total_A}')
+    # print(f'Total C : {total_C}')
+    m += total_A >= total_C + 100
 
     # lancement de l'optimisation
     m.optimize()
@@ -173,9 +180,12 @@ def modeleDecoupePapierAdam(width, listeBandes, prix_euro_par_metre, prix_waste)
     # Total of band A + band C must be less than 750
     # Example :
     # 3AAA + 4AACC + AEE + 0BDE + 2CC + 3CCC <= 750
-    total_A = xsum(var[j] * varname[j].count("A") for j in range(0, len(cuts)))
-    total_C = xsum(var[j] * varname[j].count("C") for j in range(0, len(cuts)))
-    print(f'Total A + C : {total_A + total_C}')
+    total_A = 0
+    total_C = 0
+    for i in range(0, len(cuts)):
+        total_A += var[i] * varname[i].count("A")
+        total_C += var[i] * varname[i].count("C")
+    # print(f'Total A + C : {total_A + total_C}')
     m += total_A + total_C <= 750
 
     # lancement de l'optimisation
