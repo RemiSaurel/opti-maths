@@ -38,6 +38,14 @@ def modeleDecoupePapierRemi(width, listeBandes, prix_euro_par_metre, prix_waste)
     print("Dico : ")
     print(dico)
 
+    # create a dictionary that matches a letter to each price of prix_euro_par_metre
+    dico_prix = {}
+    for i in range(0, len(prix_euro_par_metre)):
+        dico_prix[chr(65 + i)] = prix_euro_par_metre[i]
+
+    print("Dico prix : ")
+    print(dico_prix)
+
     # for each cut, create a variable from the letters of the bandes in the cut matching the width of the cut
     # each times it is used
     varname = []
@@ -53,7 +61,15 @@ def modeleDecoupePapierRemi(width, listeBandes, prix_euro_par_metre, prix_waste)
 
     # set the objective
     print(f'Waste : {sum(waste) * PRIX_WASTE}')
-    m.objective = xsum(prix_euro_par_metre[i] * var[i] for i in range(0, len(prix_euro_par_metre))) - sum(waste) * PRIX_WASTE
+    # we want to maximize the profit
+    total_bandes_profits = xsum(dico_prix[varname[i][j]] * var[i] for i in range(0, len(varname))
+                       for j in range(0, len(varname[i])))
+    print(f'Total bandes profits : {total_bandes_profits}')
+
+    # get the total waste cost and add it to the total profit
+    total_waste_cost = xsum(waste[i] * PRIX_WASTE * var[i] / 100 for i in range(0, len(varname)))
+    print(f'Total waste cost : {total_waste_cost}')
+    m.objective = total_bandes_profits - total_waste_cost
 
     #############
     # CONSTRAINTS
@@ -138,6 +154,14 @@ def modeleDecoupePapierAdam(width, listeBandes, prix_euro_par_metre, prix_waste)
 
     print(dico)
 
+    # create a dictionary that matches a letter to each price of prix_euro_par_metre
+    dico_prix = {}
+    for i in range(0, len(prix_euro_par_metre)):
+        dico_prix[chr(65 + i)] = prix_euro_par_metre[i]
+
+    print("Dico prix : ")
+    print(dico_prix)
+
     # for each cut, create a variable from the letters of the bandes in the cut matching the width of the cut
     # each times it is used
     varname = []
@@ -152,8 +176,15 @@ def modeleDecoupePapierAdam(width, listeBandes, prix_euro_par_metre, prix_waste)
 
     # set the objective
     print(f'Waste : {sum(waste) * PRIX_WASTE}')
-    m.objective = xsum(prix_euro_par_metre[i] * var[i] for i in range(0, len(prix_euro_par_metre))) - sum(
-        waste) * PRIX_WASTE
+    # we want to maximize the profit
+    total_bandes_profits = xsum(dico_prix[varname[i][j]] * var[i] for i in range(0, len(varname))
+                       for j in range(0, len(varname[i])))
+    print(f'Total bandes profits : {total_bandes_profits}')
+
+    # get the total waste cost and add it to the total profit
+    total_waste_cost = xsum(waste[i] * PRIX_WASTE * var[i] / 100 for i in range(0, len(varname)))
+    print(f'Total waste cost : {total_waste_cost}')
+    m.objective = total_bandes_profits - total_waste_cost
 
     #############
     # CONSTRAINTS
