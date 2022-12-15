@@ -1,50 +1,50 @@
 from mip import *
 
-def modeleDecoupePapierRemi(width, listeBandes, prix_euro_par_metre, prix_waste):
+def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
     # creation du modele
     m = Model("papier", sense=MAXIMIZE)
     # MAX WASTE = PLUS PETITE BANDE DE LISTE BANDES
-    MAX_WASTE = min(listeBandes)
-    PRIX_WASTE = prix_waste
+    MAX_WASTE = min(listBands)
+    waste_price = waste_price
 
     cuts = []
     waste = []
 
-    def findCuts(liste_bandes, width_restante, bande_actuelle):
-        if MAX_WASTE > width_restante >= 0:
-            cuts.append(bande_actuelle)
-        elif width_restante > 0:
-            for i in range(0, len(liste_bandes)):
-                findCuts(liste_bandes[i:],
-                         width_restante - liste_bandes[i],
-                         bande_actuelle + [liste_bandes[i]])
+    def findCuts(listBands, width_left, current_band):
+        if MAX_WASTE > width_left >= 0:
+            cuts.append(current_band)
+        elif width_left > 0:
+            for i in range(0, len(listBands)):
+                findCuts(listBands[i:],
+                         width_left - listBands[i],
+                         current_band + [listBands[i]])
 
     # find the waste for each cuts from cuts
     def findWaste(cuts):
         for cut in cuts:
             waste.append(width - sum(cut))
 
-    findCuts(listeBandes, width, [])
+    findCuts(listBands, width, [])
     findWaste(cuts)
 
     print("Liste des coupes : " + str(cuts))
     print("Liste des pertes : " + str(waste))
 
-    # create a dictionary that matches a letter to each bande of listeBandes
+    # create a dictionary that matches a letter to each bande of listBands
     dico = {}
-    for i in range(0, len(listeBandes)):
-        dico[chr(65 + i)] = listeBandes[i]
+    for i in range(0, len(listBands)):
+        dico[chr(65 + i)] = listBands[i]
 
     print("Dico : ")
     print(dico)
 
-    # create a dictionary that matches a letter to each price of prix_euro_par_metre
-    dico_prix = {}
-    for i in range(0, len(prix_euro_par_metre)):
-        dico_prix[chr(65 + i)] = prix_euro_par_metre[i]
+    # create a dictionary that matches a letter to each price of price_euro_by_meter
+    dict_price = {}
+    for i in range(0, len(price_euro_by_meter)):
+        dict_price[chr(65 + i)] = price_euro_by_meter[i]
 
     print("Dico prix : ")
-    print(dico_prix)
+    print(dict_price)
 
     # for each cut, create a variable from the letters of the bandes in the cut matching the width of the cut
     # each times it is used
@@ -60,16 +60,16 @@ def modeleDecoupePapierRemi(width, listeBandes, prix_euro_par_metre, prix_waste)
     var = [m.add_var(v) for v in varname]
 
     # set the objective
-    print(f'Waste : {sum(waste) * PRIX_WASTE}')
+    print(f'Waste : {sum(waste) * waste_price}')
     # we want to maximize the profit
-    total_bandes_profits = xsum(dico_prix[varname[i][j]] * var[i] for i in range(0, len(varname))
+    total_bands_profit = xsum(dict_price[varname[i][j]] * var[i] for i in range(0, len(varname))
                        for j in range(0, len(varname[i])))
-    print(f'Total bandes profits : {total_bandes_profits}')
+    print(f'Total bandes profits : {total_bands_profit}')
 
     # get the total waste cost and add it to the total profit
-    total_waste_cost = xsum(waste[i] * PRIX_WASTE * var[i] / 100 for i in range(0, len(varname)))
+    total_waste_cost = xsum(waste[i] * waste_price * var[i] / 100 for i in range(0, len(varname)))
     print(f'Total waste cost : {total_waste_cost}')
-    m.objective = total_bandes_profits - total_waste_cost
+    m.objective = total_bands_profit - total_waste_cost
 
     #############
     # CONSTRAINTS
@@ -89,7 +89,7 @@ def modeleDecoupePapierRemi(width, listeBandes, prix_euro_par_metre, prix_waste)
     # Example :
     # Letter : A
     # 3AAA + ABB + ABC + ... <= 0.5 * total_produced
-    for i in range(0, len(listeBandes)):
+    for i in range(0, len(listBands)):
         letter = chr(65 + i)
         m += xsum(var[j] * varname[j].count(letter) for j in range(0, len(cuts)) if letter in varname[j]) <= 0.5 * total_produced
     
@@ -117,50 +117,50 @@ def modeleDecoupePapierRemi(width, listeBandes, prix_euro_par_metre, prix_waste)
         print("No solution")
 
 
-def modeleDecoupePapierAdam(width, listeBandes, prix_euro_par_metre, prix_waste):
+def modeleDecoupePapierAdam(width, listBands, price_euro_by_meter, waste_price):
     # creation du modele
     m = Model("papier", sense=MAXIMIZE)
     # MAX WASTE = PLUS PETITE BANDE DE LISTE BANDES
-    MAX_WASTE = min(listeBandes)
-    PRIX_WASTE = prix_waste
+    MAX_WASTE = min(listBands)
+    waste_price = waste_price
 
     cuts = []
     waste = []
 
-    def findCuts(liste_bandes, width_restante, bande_actuelle):
-        if MAX_WASTE > width_restante >= 0:
-            cuts.append(bande_actuelle)
-        elif width_restante > 0:
-            for i in range(0, len(liste_bandes)):
-                findCuts(liste_bandes[i:],
-                         width_restante - liste_bandes[i],
-                         bande_actuelle + [liste_bandes[i]])
+    def findCuts(listBands, width_left, current_band):
+        if MAX_WASTE > width_left >= 0:
+            cuts.append(current_band)
+        elif width_left > 0:
+            for i in range(0, len(listBands)):
+                findCuts(listBands[i:],
+                         width_left - listBands[i],
+                         current_band + [listBands[i]])
 
     # find the waste for each cuts from cuts
     def findWaste(cuts):
         for cut in cuts:
             waste.append(width - sum(cut))
 
-    findCuts(listeBandes, width, [])
+    findCuts(listBands, width, [])
     findWaste(cuts)
 
     print("Liste des coupes : " + str(cuts))
     print("Liste des pertes : " + str(waste))
 
-    # create a dictionary that matches a letter to each bande of listeBandes
+    # create a dictionary that matches a letter to each bande of listBands
     dico = {}
-    for i in range(0, len(listeBandes)):
-        dico[chr(65 + i)] = listeBandes[i]
+    for i in range(0, len(listBands)):
+        dico[chr(65 + i)] = listBands[i]
 
     print(dico)
 
-    # create a dictionary that matches a letter to each price of prix_euro_par_metre
-    dico_prix = {}
-    for i in range(0, len(prix_euro_par_metre)):
-        dico_prix[chr(65 + i)] = prix_euro_par_metre[i]
+    # create a dictionary that matches a letter to each price of price_euro_by_meter
+    dict_price = {}
+    for i in range(0, len(price_euro_by_meter)):
+        dict_price[chr(65 + i)] = price_euro_by_meter[i]
 
     print("Dico prix : ")
-    print(dico_prix)
+    print(dict_price)
 
     # for each cut, create a variable from the letters of the bandes in the cut matching the width of the cut
     # each times it is used
@@ -175,16 +175,16 @@ def modeleDecoupePapierAdam(width, listeBandes, prix_euro_par_metre, prix_waste)
     var = [m.add_var(v) for v in varname]
 
     # set the objective
-    print(f'Waste : {sum(waste) * PRIX_WASTE}')
+    print(f'Waste : {sum(waste) * waste_price}')
     # we want to maximize the profit
-    total_bandes_profits = xsum(dico_prix[varname[i][j]] * var[i] for i in range(0, len(varname))
+    total_bands_profit = xsum(dict_price[varname[i][j]] * var[i] for i in range(0, len(varname))
                        for j in range(0, len(varname[i])))
-    print(f'Total bandes profits : {total_bandes_profits}')
+    print(f'Total bandes profits : {total_bands_profit}')
 
     # get the total waste cost and add it to the total profit
-    total_waste_cost = xsum(waste[i] * PRIX_WASTE * var[i] / 100 for i in range(0, len(varname)))
+    total_waste_cost = xsum(waste[i] * waste_price * var[i] / 100 for i in range(0, len(varname)))
     print(f'Total waste cost : {total_waste_cost}')
-    m.objective = total_bandes_profits - total_waste_cost
+    m.objective = total_bands_profit - total_waste_cost
 
     #############
     # CONSTRAINTS
@@ -204,7 +204,7 @@ def modeleDecoupePapierAdam(width, listeBandes, prix_euro_par_metre, prix_waste)
     # Example :
     # Letter : A
     # 3AAA + ABB + ABC + ... <= 0.5 * total_produced
-    for i in range(0, len(listeBandes)):
+    for i in range(0, len(listBands)):
         letter = chr(65 + i)
         m += xsum(var[j] * varname[j].count(letter) for j in range(0, len(cuts)) if letter in varname[j]) <= 0.5 * total_produced
 
