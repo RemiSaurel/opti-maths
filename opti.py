@@ -1,6 +1,14 @@
 from mip import *
 
 def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
+    '''
+
+    :param width: largeur
+    :param listBands: liste des bandes
+    :param price_euro_by_meter: prix par metre
+    :param waste_price: prix perte
+    :return: None
+    '''
     # creation du modele
     m = Model("papier", sense=MAXIMIZE)
     # MAX WASTE = PLUS PETITE BANDE DE LISTE BANDES
@@ -11,6 +19,13 @@ def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
     waste = []
 
     def findCuts(listBands, width_left, current_band):
+        '''
+        Fonction récursive qui trouve toutes les coupes possibles (optimisation avec programmation dynamique)
+        :param listBands:
+        :param width_left:
+        :param current_band:
+        :return:
+        '''
         if MAX_WASTE > width_left >= 0:
             cuts.append(current_band)
         elif width_left > 0:
@@ -19,8 +34,12 @@ def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
                          width_left - listBands[i],
                          current_band + [listBands[i]])
 
-    # find the waste for each cuts from cuts
     def findWaste(cuts):
+        '''
+        Trouve les pertes pour chaque coupe
+        :param cuts:
+        :return:
+        '''
         for cut in cuts:
             waste.append(width - sum(cut))
 
