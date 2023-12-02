@@ -1,14 +1,15 @@
 from mip import *
 
-def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
-    '''
 
+def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
+    """
+    Fonction principale qui lance le modèle de découpe de papier
     :param width: largeur
     :param listBands: liste des bandes
     :param price_euro_by_meter: prix par metre
     :param waste_price: prix perte
     :return: None
-    '''
+    """
     # creation du modele
     m = Model("papier", sense=MAXIMIZE)
     # MAX WASTE = PLUS PETITE BANDE DE LISTE BANDES
@@ -19,13 +20,13 @@ def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
     waste = []
 
     def findCuts(listBands, width_left, current_band):
-        '''
+        """
         Fonction récursive qui trouve toutes les coupes possibles (optimisation avec programmation dynamique)
         :param listBands:
         :param width_left:
         :param current_band:
         :return:
-        '''
+        """
         if MAX_WASTE > width_left >= 0:
             cuts.append(current_band)
         elif width_left > 0:
@@ -35,11 +36,11 @@ def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
                          current_band + [listBands[i]])
 
     def findWaste(cuts):
-        '''
+        """
         Trouve les pertes pour chaque coupe
         :param cuts:
         :return:
-        '''
+        """
         for cut in cuts:
             waste.append(width - sum(cut))
 
@@ -82,7 +83,7 @@ def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
     print(f'Waste : {sum(waste) * waste_price}')
     # we want to maximize the profit
     total_bands_profit = xsum(dict_price[varname[i][j]] * var[i] for i in range(0, len(varname))
-                       for j in range(0, len(varname[i])))
+                              for j in range(0, len(varname[i])))
     print(f'Total bandes profits : {total_bands_profit}')
 
     # get the total waste cost and add it to the total profit
@@ -110,8 +111,9 @@ def modeleDecoupePapierRemi(width, listBands, price_euro_by_meter, waste_price):
     # 3AAA + ABB + ABC + ... <= 0.5 * total_produced
     for i in range(0, len(listBands)):
         letter = chr(65 + i)
-        m += xsum(var[j] * varname[j].count(letter) for j in range(0, len(cuts)) if letter in varname[j]) <= 0.5 * total_produced
-    
+        m += xsum(var[j] * varname[j].count(letter) for j in range(0, len(cuts)) if
+                  letter in varname[j]) <= 0.5 * total_produced
+
     # Must produce 100 meters more of A band than C band
     # Example :
     # 3AAA + 2AAB + AEE >= (BCD + 3CCC) + 100
@@ -197,7 +199,7 @@ def modeleDecoupePapierAdam(width, listBands, price_euro_by_meter, waste_price):
     print(f'Waste : {sum(waste) * waste_price}')
     # we want to maximize the profit
     total_bands_profit = xsum(dict_price[varname[i][j]] * var[i] for i in range(0, len(varname))
-                       for j in range(0, len(varname[i])))
+                              for j in range(0, len(varname[i])))
     print(f'Total bandes profits : {total_bands_profit}')
 
     # get the total waste cost and add it to the total profit
@@ -225,7 +227,8 @@ def modeleDecoupePapierAdam(width, listBands, price_euro_by_meter, waste_price):
     # 3AAA + ABB + ABC + ... <= 0.5 * total_produced
     for i in range(0, len(listBands)):
         letter = chr(65 + i)
-        m += xsum(var[j] * varname[j].count(letter) for j in range(0, len(cuts)) if letter in varname[j]) <= 0.5 * total_produced
+        m += xsum(var[j] * varname[j].count(letter) for j in range(0, len(cuts)) if
+                  letter in varname[j]) <= 0.5 * total_produced
 
     # Total of band A + band C must be less than 750
     # Example :

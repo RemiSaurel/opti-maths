@@ -2,11 +2,11 @@ from opti import *
 
 
 def printModulo(numero):
-    '''
+    """
     Affiche les modulos de 3 à 7 d'un numéro étudiant
-    :param numero: numéro étudiant
-    :return: None
-    '''
+    :param numero:
+    :return:
+    """
     # Il nous fallait les modulos de 3 à 7, à changer si besoin
     for i in range(3, 8):
         print("Modulo " + str(i) + " : " + str(numero % i))
